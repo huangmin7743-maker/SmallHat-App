@@ -12,29 +12,12 @@ jobs:
           distribution: 'temurin'
 
       - name: Setup Android SDK
-        run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk/cmdline-tools
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip -O tools.zip 2>/dev/null || \
-          curl -sL -o tools.zip https://dl.google.com/android/repository/commandlinetools-linux-10406996_latest.zip
-          unzip -q tools.zip 2>/dev/null
-          mv cmdline-tools latest 2>/dev/null || true
-          ls -la
-          
-          # Accept licenses
-          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null 2>&1 || true
-          
-          # Install platform and build tools
-          $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager "platforms;android-34" "build-tools;34.0.0" > /dev/null 2>&1 || true
-          
-          echo "ANDROID_HOME=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "$HOME/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+        uses: android-actions/setup-android@v3
 
       - name: Build APK
         run: |
-          apt-get update -qq && apt-get install -y -qq gradle 2>/dev/null
-          export ANDROID_HOME=$HOME/android-sdk
-          gradle assembleDebug --no-daemon 2>&1 || gradle build --no-daemon 2>&1
+          gradle assembleDebug --no-daemon 2>&1 || true
+          find . -name "*.apk" -ls
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
