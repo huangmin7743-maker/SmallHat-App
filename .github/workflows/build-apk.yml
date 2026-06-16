@@ -5,23 +5,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
       - uses: actions/setup-java@v4
-        with:
-          java-version: '17'
-          distribution: 'temurin'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
+        with: { java-version: '17', distribution: 'temurin' }
+      - uses: android-actions/setup-android@v3
       - name: Build APK
         run: |
-          gradle assembleDebug --no-daemon 2>&1 || true
-          find . -name "*.apk" -ls
-
-      - name: Upload APK
+          gradle assembleDebug --no-daemon 2>&1
+          echo "=== Searching for APKs ==="
+          find / -name "*.apk" 2>/dev/null | head -20
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
           name: SmallHat-APK
-          path: "**/*.apk"
+          path: "/home/runner/work/**/*.apk"
           retention-days: 30
